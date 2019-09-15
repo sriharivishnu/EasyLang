@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.PixelCopy;
@@ -49,6 +50,7 @@ import com.google.firebase.ml.vision.label.FirebaseVisionImageLabeler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseVisionImageLabeler labeler;
     private TextView textView;
     private ArrayList<Anchor> anchors;
+    private TextToSpeech textToSpeech;
     private Session session;
     private Boolean language_available = false;
     private FirebaseTranslator englishfrench;
@@ -79,6 +82,14 @@ public class MainActivity extends AppCompatActivity {
         fragment.getPlaneDiscoveryController().setInstructionView(null);
         anchors = new ArrayList<>();
         textView = findViewById(R.id.textView);
+        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+                if (i != TextToSpeech.ERROR) {
+                    textToSpeech.setLanguage(Locale.FRENCH);
+                }
+            }
+        });
         try {
             Session session = new Session(this);
         }
@@ -125,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
                         });
 
     }
-
     public void getImage() {
         ArSceneView view = fragment.getArSceneView();
         bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), android.graphics.Bitmap.Config.ARGB_8888);
@@ -196,6 +206,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess(String s) {
                 title.setText(s);
+                textToSpeech.speak(s, TextToSpeech.QUEUE_FLUSH, null, null);
             }
         });
 
