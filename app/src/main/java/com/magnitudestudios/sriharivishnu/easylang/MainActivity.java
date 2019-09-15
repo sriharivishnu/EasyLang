@@ -20,10 +20,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.ar.core.Anchor;
-import com.google.ar.core.Frame;
-import com.google.ar.core.HitResult;
-import com.google.ar.core.Plane;
-import com.google.ar.core.Point;
 import com.google.ar.core.Pose;
 import com.google.ar.core.Session;
 import com.google.ar.core.Trackable;
@@ -64,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseVisionImage firebaseVisionImage;
     FirebaseVisionImageLabeler labeler;
     private TextView textView;
-    private ArrayList<Anchor> anchors;
     private TextToSpeech textToSpeech;
     private Session session;
     private Boolean language_available = false;
@@ -75,12 +70,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Configuring vision API
         FirebaseVisionCloudImageLabelerOptions options = new FirebaseVisionCloudImageLabelerOptions.Builder().setConfidenceThreshold(0.7f).build();
         labeler = FirebaseVision.getInstance().getCloudImageLabeler(options);
+        //Initializing AR Fragment
         fragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.ux_fragment);
         fragment.getPlaneDiscoveryController().hide();
         fragment.getPlaneDiscoveryController().setInstructionView(null);
-        anchors = new ArrayList<>();
+
+        //Init textview and text to speech services
         textView = findViewById(R.id.textView);
         textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
@@ -90,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        //Start a AR Core Session
         try {
             Session session = new Session(this);
         }
@@ -106,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("ERROR: ", "Device not compatible");
         }
 
+        //Button to trigger get image function which will use the image to feed into ML-Vision
         button = findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,12 +114,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Translator API init
         FirebaseTranslatorOptions firebaseTranslatorOptions = new FirebaseTranslatorOptions.Builder()
                         .setSourceLanguage(FirebaseTranslateLanguage.EN)
                         .setTargetLanguage(FirebaseTranslateLanguage.FR)
                         .build();
+        //English to French translator
         englishfrench = FirebaseNaturalLanguage.getInstance().getTranslator(firebaseTranslatorOptions);
 
+        //Download necessary files if not already there
         FirebaseModelDownloadConditions conditions = new FirebaseModelDownloadConditions.Builder()
                 .requireWifi()
                 .build();
@@ -136,9 +139,12 @@ public class MainActivity extends AppCompatActivity {
                         });
 
     }
+    //Gets image from AR Fragment
     public void getImage() {
         ArSceneView view = fragment.getArSceneView();
         bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), android.graphics.Bitmap.Config.ARGB_8888);
+
+        //Processes image in different thread
         final HandlerThread handlerThread = new HandlerThread("ViewCopier");
         handlerThread.start();
 
@@ -178,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
         }, new Handler(handlerThread.getLooper()));
     }
 
+    //Get the top result for labels
     private String getLabels(List<FirebaseVisionImageLabel> labels) {
         if (labels.size() > 0) {
             textView.setText(labels.get(0).getText());
@@ -188,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    //Build the renderable
     private void addLabel(String label, Anchor anchor) {
 
         CompletableFuture future = ViewRenderable.builder().setView(this, R.layout.label).build();
@@ -196,19 +204,25 @@ public class MainActivity extends AppCompatActivity {
             addToScene((ViewRenderable) renderable, anchor, label);
         });
     }
+
+    //Add the new renderable to the scene
     private void addToScene(ViewRenderable renderable, Anchor anchor, String label) {
         AnchorNode anchorNode = new AnchorNode(anchor);
         anchorNode.setRenderable(renderable);
         fragment.getArSceneView().getScene().addChild(anchorNode);
         View v = renderable.getView();
         TextView title = v.findViewById(R.id.label_title);
-        englishfrench.translate(label).addOnSuccessListener(new OnSuccessListener<String>() {
-            @Override
-            public void onSuccess(String s) {
-                title.setText(s);
-                textToSpeech.speak(s, TextToSpeech.QUEUE_FLUSH, null, null);
-            }
-        });
+        //Translate
+        if (language_available) {
+            englishfrench.translate(label).addOnSuccessListener(new OnSuccessListener<String>() {
+                @Override
+                public void onSuccess(String s) {
+                    title.setText(s);
+                    //Text to Speech
+                    textToSpeech.speak(s, TextToSpeech.QUEUE_FLUSH, null, null);
+                }
+            });
+        }
 
     }
 }
