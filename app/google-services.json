@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "71198627730",
+    "firebase_url": "https://easylang-225a4.firebaseio.com",
+    "project_id": "easylang-225a4",
+    "storage_bucket": "easylang-225a4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:71198627730:android:8c4abdcca7db8108fe534b",
+        "android_client_info": {
+          "package_name": "com.magnitudestudios.sriharivishnu.easylang"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "71198627730-8q4buvu9s9c9aes2f6b3ktuatlj8dh4n.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.magnitudestudios.sriharivishnu.easylang",
+            "certificate_hash": "a0cbf29b616b2d2042e94be8ce6655afde76b6a2"
+          }
+        },
+        {
+          "client_id": "71198627730-7pegbnube3vccp2pl11vi46eum9dk0ng.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDl7JwoL1gVSR6Y-GnFSgcC4TK5WG2LU-c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "71198627730-7pegbnube3vccp2pl11vi46eum9dk0ng.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "71198627730-doeel7cgfojm7g6plq9c1mlb56tekvjc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "MagnitudeStudios.EasyLang"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
