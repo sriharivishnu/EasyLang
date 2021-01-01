@@ -1,4 +1,4 @@
-# EasyLang
+# EasyLang (HackTheNorth 2019 Submission)
 Identifies objects in real-time and displays the translated object name in Augmented Reality.
 
 ## Screenshot
